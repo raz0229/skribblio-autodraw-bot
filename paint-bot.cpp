@@ -11,6 +11,9 @@
 #include <cmath>
 #include <cstdint>
 #include <wininet.h>
+#include <set>
+#include <string>
+#include <unordered_map>
 #include <opencv2/opencv.hpp>
 
 // Bitmap file header structure
@@ -285,50 +288,80 @@ public:
         return screenMat;
     }
 
-    void startDrawing(const std::string& imagePath, AutoClicker ac, int brush_size = 4) {
-        // Initialize GDI+
-        Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-        ULONG_PTR gdiplusToken;
-        Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
-
-        // Load the image
-        std::wstring wImagePath(imagePath.begin(), imagePath.end());
-        Gdiplus::Bitmap bitmap(wImagePath.c_str());
-
-        if (bitmap.GetLastStatus() != Gdiplus::Ok) {
-            throw std::runtime_error("Failed to load the image.");
+    void startDrawing(const cv::Mat& image, AutoClicker& ac, int brush_size = 4) {
+        if (image.empty()) {
+            throw std::runtime_error("The provided image is empty.");
         }
 
         // Get image dimensions
-        int width = bitmap.GetWidth();
-        int height = bitmap.GetHeight();
+        int width = image.cols;
+        int height = image.rows;
 
         // Process each pixel
         for (int y = 0; y < height; ++y) {
             int counter = 0;
             for (int x = 0; x < width; ++x) {
-                Gdiplus::Color color;
-                bitmap.GetPixel(x, y, &color);
+                // Get the pixel color (BGR format in OpenCV)
+                cv::Vec3b color = image.at<cv::Vec3b>(y, x);
 
                 // Check if the pixel is white
-                bool isWhite = (color.GetR() == 255 && color.GetG() == 255 && color.GetB() == 255);
+                bool isWhite = (color[0] == 255 && color[1] == 255 && color[2] == 255);
                 if (!isWhite) {
                     counter++;
                     if (counter == brush_size) {
+                        // Emulate mouse click at a specific position
                         ac.emulateMouseClick(200 + x, 300 + y);
                         counter = 0;
                     }
                 }
-                    
-                //outputFile << (isWhite ? "0" : "1");
             }
-            //outputFile << "\n";
         }
-
-
-        // Cleanup
-        Gdiplus::GdiplusShutdown(gdiplusToken);
     }
+
+    //void startDrawing(const std::string& imagePath, AutoClicker ac, int brush_size = 4) {
+    //    // Initialize GDI+
+    //    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    //    ULONG_PTR gdiplusToken;
+    //    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
+
+    //    // Load the image
+    //    std::wstring wImagePath(imagePath.begin(), imagePath.end());
+    //    Gdiplus::Bitmap bitmap(wImagePath.c_str());
+
+    //    if (bitmap.GetLastStatus() != Gdiplus::Ok) {
+    //        throw std::runtime_error("Failed to load the image.");
+    //    }
+
+    //    // Get image dimensions
+    //    int width = bitmap.GetWidth();
+    //    int height = bitmap.GetHeight();
+
+    //    // Process each pixel
+    //    for (int y = 0; y < height; ++y) {
+    //        int counter = 0;
+    //        for (int x = 0; x < width; ++x) {
+    //            Gdiplus::Color color;
+    //            bitmap.GetPixel(x, y, &color);
+
+    //            // Check if the pixel is white
+    //            bool isWhite = (color.GetR() == 255 && color.GetG() == 255 && color.GetB() == 255);
+    //            if (!isWhite) {
+    //                counter++;
+    //                if (counter == brush_size) {
+    //                    ac.emulateMouseClick(200 + x, 300 + y);
+    //                    counter = 0;
+    //                }
+    //            }
+    //                
+    //            //outputFile << (isWhite ? "0" : "1");
+    //        }
+    //        //outputFile << "\n";
+    //    }
+
+
+    //    // Cleanup
+    //    Gdiplus::GdiplusShutdown(gdiplusToken);
+    //}
 
     void scaleBMP(const std::string& inputPath, const std::string& outputPath, int newWidth, int newHeight) {
         // Open the input BMP file
@@ -512,6 +545,65 @@ public:
         return true;
     }
 
+    // Custom hash function for cv::Vec3b
+    struct Vec3bHash {
+        std::size_t operator()(const cv::Vec3b& color) const {
+            return ((std::size_t)color[0]) | (((std::size_t)color[1]) << 8) | (((std::size_t)color[2]) << 16);
+        }
+    };
+
+    // Function to split BMP image into files based on unique colors
+    void splitImageByColorsAndStartDrawing(const std::string& inputFile, AutoClicker &ac, std::vector<ColorEntry> colorPallete, int cellWidth=20, int cellHeight=20, int bias=10) {
+        // Load the BMP image
+        cv::Mat image = cv::imread(inputFile, cv::IMREAD_COLOR);
+        if (image.empty()) {
+            std::cerr << "Error: Could not load the image." << std::endl;
+            return;
+        }
+
+        // Map to store unique colors and their associated output Mat
+        std::unordered_map<cv::Vec3b, cv::Mat, Vec3bHash> colorMaps;
+
+        // Create a white background
+        cv::Mat whiteBackground(image.size(), image.type(), cv::Scalar(255, 255, 255)); // Proper white background (BGR)
+
+        // Iterate through every pixel in the image
+        for (int row = 0; row < image.rows; ++row) {
+            for (int col = 0; col < image.cols; ++col) {
+                // Get the current pixel color
+                cv::Vec3b color = image.at<cv::Vec3b>(row, col);
+
+                // Check if the color is already in the map
+                if (colorMaps.find(color) == colorMaps.end()) {
+                    // If not, create a new blank Mat and add it to the map
+                    colorMaps[color] = whiteBackground.clone();
+                }
+
+                // Set the pixel in the specific color map
+                colorMaps[color].at<cv::Vec3b>(row, col) = color;
+            }
+        }
+
+        int count = 0;
+        for (const auto& pair : colorMaps) {
+            const cv::Vec3b& color = pair.first;
+            const cv::Mat& coloredImage = pair.second;
+            
+            // Print the RGB value of the color (convert from BGR to RGB)
+            std::cout << "Selecting color RGB("
+                    << (int)color[2] << ", "  // Red
+                    << (int)color[1] << ", "  // Green
+                    << (int)color[0] << ")"   // Blue
+                    << std::endl;
+
+            // Select a color
+            ac.selectColorFromPallete(colorPallete, { color[2], color[1], color[0]}, *this, cellWidth, cellHeight, bias);
+            this->startDrawing(coloredImage, ac);
+
+        }
+    }
+
+
     // Function to locate the image on the screen
     cv::Point locateImageOnScreen(const cv::Mat& screenImage, const cv::Mat& templateImage) {
         if (screenImage.empty() || templateImage.empty()) {
@@ -672,10 +764,10 @@ int main() {
         ImageDownloader id;
 
         // Select a color
-        ac.selectColorFromPallete(colorPalette, { 112,146,190 }, ip, 22, 22, 10);
+        //ac.selectColorFromPallete(colorPalette, { 112,146,190 }, ip, 22, 22, 10);
         //ac.testColorPalleteAlignment(colorPalette, ip, 22, 22, 10);
         // Download image as BMP
-        //id.downloadImageUsingGoogleSearch("samsung", "download.bmp");
+        //id.downloadImageUsingGoogleSearch("watermelon", "download.bmp");
         
 
         // convert image into bmp
@@ -698,13 +790,13 @@ int main() {
         ip.scaleBMP(inputPath, "image_scaled.bmp", newWidth, newHeight); // image is scaled
         std::cout << "Image scaled successfully. Saved to image_scaled.bmp" << std::endl;
         ip.reduceImageColors("image_scaled.bmp", "image_20bit.bmp", colorPalette); // Reduce the scaled image into a 20-bit color image
-        //ip.startDrawing("image_20bit.bmp", ac);
         std::cout << "Image processed successfully. Check the output file: " << outputPath << std::endl;
 
 
-
-
-
+        // Split image colors and start drawing
+        std::cout << "Sleeping for 3 seconds" << std::endl;
+        Sleep(3000);
+        ip.splitImageByColorsAndStartDrawing("image_20bit.bmp", ac, colorPalette, 20,20,10);
 
 
         // // Load the template image
