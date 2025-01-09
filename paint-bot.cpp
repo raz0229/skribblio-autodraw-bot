@@ -87,13 +87,28 @@ class AutoClicker {
 
 public:
     // Function to emulate a mouse click at given x, y coordinates
-    void emulateMouseClick(int x, int y) {
+    void emulateMouseClick(int x, int y, bool addDelay = false) {
         // Move the cursor to the specified coordinates
         SetCursorPos(x, y);
 
-        // Emulate mouse left button down and up
+        if (addDelay) {
+
+            /*
+                A slight dynamic Delay is recommended especially when selecting a color,
+                the correct execution of which is absolutely necessary for the bot to draw right
+            */
+
+            // Get the current tick count
+            DWORD start_time = GetTickCount64();
+
+            // Wait for a short duration (e.g., 50 milliseconds)
+            while (GetTickCount64() - start_time < 50);
+        }
+
+        //Emulate mouse left button down and up
         mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
         mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+
     }
 
     void selectColorFromPallete(std::vector<ColorEntry> ce, RGB colorToSelect, ImageProcessor& ip, int cellWidth, int cellHeight, int bias=10);
@@ -290,26 +305,26 @@ public:
 
     void startDrawing(const cv::Mat& image, AutoClicker& ac, int brush_size = 4) {
         if (image.empty()) {
-            throw std::runtime_error("The provided image is empty.");
+            throw std::runtime_error("the provided image is empty.");
         }
 
-        // Get image dimensions
+        // get image dimensions
         int width = image.cols;
         int height = image.rows;
 
-        // Process each pixel
+        // process each pixel
         for (int y = 0; y < height; ++y) {
             int counter = 0;
             for (int x = 0; x < width; ++x) {
-                // Get the pixel color (BGR format in OpenCV)
+                // get the pixel color (bgr format in opencv)
                 cv::Vec3b color = image.at<cv::Vec3b>(y, x);
 
-                // Check if the pixel is white
-                bool isWhite = (color[0] == 255 && color[1] == 255 && color[2] == 255);
-                if (!isWhite) {
+                // check if the pixel is white
+                bool iswhite = (color[0] == 255 && color[1] == 255 && color[2] == 255);
+                if (!iswhite) {
                     counter++;
                     if (counter == brush_size) {
-                        // Emulate mouse click at a specific position
+                        // emulate mouse click at a specific position
                         ac.emulateMouseClick(200 + x, 300 + y);
                         counter = 0;
                     }
@@ -318,50 +333,7 @@ public:
         }
     }
 
-    //void startDrawing(const std::string& imagePath, AutoClicker ac, int brush_size = 4) {
-    //    // Initialize GDI+
-    //    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-    //    ULONG_PTR gdiplusToken;
-    //    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
 
-    //    // Load the image
-    //    std::wstring wImagePath(imagePath.begin(), imagePath.end());
-    //    Gdiplus::Bitmap bitmap(wImagePath.c_str());
-
-    //    if (bitmap.GetLastStatus() != Gdiplus::Ok) {
-    //        throw std::runtime_error("Failed to load the image.");
-    //    }
-
-    //    // Get image dimensions
-    //    int width = bitmap.GetWidth();
-    //    int height = bitmap.GetHeight();
-
-    //    // Process each pixel
-    //    for (int y = 0; y < height; ++y) {
-    //        int counter = 0;
-    //        for (int x = 0; x < width; ++x) {
-    //            Gdiplus::Color color;
-    //            bitmap.GetPixel(x, y, &color);
-
-    //            // Check if the pixel is white
-    //            bool isWhite = (color.GetR() == 255 && color.GetG() == 255 && color.GetB() == 255);
-    //            if (!isWhite) {
-    //                counter++;
-    //                if (counter == brush_size) {
-    //                    ac.emulateMouseClick(200 + x, 300 + y);
-    //                    counter = 0;
-    //                }
-    //            }
-    //                
-    //            //outputFile << (isWhite ? "0" : "1");
-    //        }
-    //        //outputFile << "\n";
-    //    }
-
-
-    //    // Cleanup
-    //    Gdiplus::GdiplusShutdown(gdiplusToken);
-    //}
 
     void scaleBMP(const std::string& inputPath, const std::string& outputPath, int newWidth, int newHeight) {
         // Open the input BMP file
@@ -590,16 +562,17 @@ public:
             const cv::Mat& coloredImage = pair.second;
             
             // Print the RGB value of the color (convert from BGR to RGB)
-            std::cout << "Selecting color RGB("
+            std::cout << "Selecting color " << ++count << " RGB("
                     << (int)color[2] << ", "  // Red
                     << (int)color[1] << ", "  // Green
                     << (int)color[0] << ")"   // Blue
                     << std::endl;
 
             // Select a color
+            //Sleep(1000);
             ac.selectColorFromPallete(colorPallete, { color[2], color[1], color[0]}, *this, cellWidth, cellHeight, bias);
             this->startDrawing(coloredImage, ac);
-
+            
         }
     }
 
@@ -701,13 +674,39 @@ void AutoClicker::selectColorFromPallete(std::vector<ColorEntry> colorPallete, R
         cv::Point location = ip.locateImageOnScreen(screen, templateImage);
         std::cout << "Pallete found at: (" << location.x << ", " << location.y << ")" << std::endl;
 
+        bool found = false;
         for (ColorEntry &ce: colorPallete) {
             if (colorToSelect == ce.color) {
-                emulateMouseClick(location.x + bias + (cellWidth * ce.y), location.y + bias + (cellHeight * ce.x));
+                emulateMouseClick(location.x + bias + (cellWidth * ce.y), location.y + bias + (cellHeight * ce.x), true);
 
+
+
+                // Fetch the pixel color under the cursor
+                COLORREF color = getPixelColorUnderCursor();
+
+                // Extract the RGB components
+                RGB currentColor = { GetRValue(color), GetGValue(color), GetBValue(color) };
+
+                if (currentColor == ce.color) {
+                    std::cout << "Found Color {" << int(currentColor.r) << "," << int(currentColor.g) << "," << int(currentColor.b) << "} at Position: (" << ce.x << "," << ce.y << ") with bias " << bias << std::endl;
+                }
+                else {
+                    std::cerr << "COLOR NOT FOUND at Position: (" << ce.x << "," << ce.y << ") with bias " << bias << std::endl;
+                    std::cerr << "click x = " << (location.x + bias + (cellWidth * ce.y)) << " click y = " << (location.y + bias + (cellHeight * ce.x)) << std::endl;
+                    return;
+                    // Retry
+                    //selectColorFromPallete(colorPallete, ce.color, ip, cellWidth, cellHeight, bias);
+                }
+
+
+                std::cout << "=== COLOR FOUND (" << (int)colorToSelect.r << "," << (int)colorToSelect.g << "," << (int)colorToSelect.b << ")===\n";
+                found = true;
 
             }
         }
+
+        if (!found)
+            std::cout << "=== COLOR NOT FOUND (" << (int)colorToSelect.r << "," << (int)colorToSelect.g << "," << (int)colorToSelect.b << ")===\n";
 
     }
     catch (const std::exception& e) {
@@ -763,15 +762,28 @@ int main() {
         ImageProcessor ip;
         ImageDownloader id;
 
-        // Select a color
-        //ac.selectColorFromPallete(colorPalette, { 112,146,190 }, ip, 22, 22, 10);
+        // Test color Pallete Alignment
         //ac.testColorPalleteAlignment(colorPalette, ip, 22, 22, 10);
+       
+        /*Sleep(3000);
+        for (auto& c : colorPalette) {
+            ac.selectColorFromPallete(colorPalette, c.color, ip, 22, 22, 10);
+            Sleep(1000);
+        }
+
+        system("pause");*/
+
+       
         // Download image as BMP
-        //id.downloadImageUsingGoogleSearch("watermelon", "download.bmp");
+        id.downloadImageUsingGoogleSearch("watermelon", "download.bmp");
         
 
         // convert image into bmp
         int width, height, channels;
+        //Sleep(3000);
+        //ac.emulateMouseClick(885, 61);
+        //std::cout << "881, 61" << std::endl;
+        //system("pause");
 
         // Load the image using stb_image
         unsigned char* imageData = stbi_load("download.bmp", &width, &height, &channels, STBI_rgb);
@@ -796,36 +808,10 @@ int main() {
         // Split image colors and start drawing
         std::cout << "Sleeping for 3 seconds" << std::endl;
         Sleep(3000);
-        ip.splitImageByColorsAndStartDrawing("image_20bit.bmp", ac, colorPalette, 20,20,10);
+        ip.splitImageByColorsAndStartDrawing("image_20bit.bmp", ac, colorPalette, 20,20,14);
 
 
-        // // Load the template image
-        //cv::Mat templateImage = cv::imread("pallete.png");
-
-        //if (templateImage.empty()) {
-        //    std::cerr << "Error: Could not load the template image." << std::endl;
-        //    return -1;
-        //}
-
-        //try {
-        //    while (true) {
-        //        cv::Mat screen = ip.captureScreen();
-        //        try {
-        //            cv::Point location = ip.locateImageOnScreen(screen, templateImage);
-        //            std::cout << "Template found at: (" << location.x << ", " << location.y << ")" << std::endl;
-        //        }
-        //        catch (const std::exception& e) {
-        //            std::cerr << "Template not found: " << e.what() << std::endl;
-        //        }
-
-        //        // Optional: Add a delay between iterations to reduce CPU usage
-        //        Sleep(1000); // 1 second delay
-        //    }
-        //}
-        //catch (const std::exception& e) {
-        //    std::cerr << "Error: " << e.what() << std::endl;
-        //    return -1;
-        //}
+        
 
 
     }
