@@ -140,7 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoClicker.h" />
-    <ClInclude Include="bitmap_structs.h" />
+    <ClInclude Include="config.h" />
     <ClInclude Include="ImageDownloader.h" />
     <ClInclude Include="ImageProcessor.h" />
   </ItemGroup>

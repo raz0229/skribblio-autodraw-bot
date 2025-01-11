@@ -69,7 +69,7 @@ cv::Mat ImageProcessor::captureScreen() {
 }
 
 // Start drawing on an image
-void ImageProcessor::startDrawing(const cv::Mat& image, AutoClicker& ac, int brush_size) {
+void ImageProcessor::startDrawing(const cv::Mat& image, AutoClicker& ac, POINT clickPosition, int brush_size) {
     if (image.empty()) {
         throw std::runtime_error("The provided image is empty.");
     }
@@ -85,7 +85,7 @@ void ImageProcessor::startDrawing(const cv::Mat& image, AutoClicker& ac, int bru
             if (!isWhite) {
                 counter++;
                 if (counter == brush_size) {
-                    ac.emulateMouseClick(200 + x, 300 + y);
+                    ac.emulateMouseClick(clickPosition.x + x, clickPosition.y + y);
                     counter = 0;
                 }
             }
@@ -284,7 +284,7 @@ std::size_t ImageProcessor::Vec3bHash::operator()(const cv::Vec3b& color) const 
 }
 
 // Split the image by colors and start drawing
-void ImageProcessor::splitImageByColorsAndStartDrawing(const std::string& inputFile, AutoClicker& ac, std::vector<ColorEntry> colorPallete, int cellWidth, int cellHeight, int bias) {
+void ImageProcessor::splitImageByColorsAndStartDrawing(const std::string& inputFile, AutoClicker& ac, std::vector<ColorEntry> colorPallete, POINT clickPosition, int cellWidth, int cellHeight, int bias) {
     // Load the BMP image
     cv::Mat image = cv::imread(inputFile, cv::IMREAD_COLOR);
     if (image.empty()) {
@@ -330,7 +330,7 @@ void ImageProcessor::splitImageByColorsAndStartDrawing(const std::string& inputF
         // Select a color
         //Sleep(1000);
         ac.selectColorFromPallete(colorPallete, { color[2], color[1], color[0] }, *this, cellWidth, cellHeight, bias);
-        this->startDrawing(coloredImage, ac);
+        this->startDrawing(coloredImage, ac, clickPosition);
 
     }
 }

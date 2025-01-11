@@ -77,20 +77,20 @@ bool ImageDownloader::downloadImage(const std::string& url, const std::string& o
 }
 
 
-    void ImageDownloader::downloadImageUsingGoogleSearch(const std::string& searchTerm, const std::string& outputFile) {
+    bool ImageDownloader::downloadImageUsingGoogleSearch(const std::string& searchTerm, const std::string& outputFile) {
         try {
             const std::string cx = "7204b6b1decb42058";
             const std::string query = searchTerm + searchSuffix;
             const std::string url = "https://www.googleapis.com/customsearch/v1?q=" + query +
                 "&cx=" + cx + "&searchType=image&imgSize=LARGE&safe=high&key=" + apiKey;
 
-            // Step 1: Download the search result JSON
+            // Download the search result JSON
             std::string response;
             if (!downloadData(url, response)) {
                 throw std::runtime_error("Failed to download JSON response from Google Custom Search API.");
             }
 
-            // Step 2: Extract the image URL from the JSON response
+            // Extract the image URL from the JSON response
             std::string imageUrl = extractImageUrl(response);
             if (imageUrl.empty()) {
                 throw std::runtime_error("Failed to extract image URL from JSON response.");
@@ -98,14 +98,16 @@ bool ImageDownloader::downloadImage(const std::string& url, const std::string& o
 
             std::cout << "Image URL: " << imageUrl << std::endl;
 
-            // Step 3: Download the image and save it as BMP
+            // Download the image and save it as BMP
             if (!downloadImage(imageUrl, outputFile)) {
                 throw std::runtime_error("Failed to download and save the image.");
             }
 
             std::cout << "Image successfully saved to: " << outputFile << std::endl;
+            return true;
         }
         catch (const std::exception& e) {
             std::cerr << "Error: " << e.what() << std::endl;
+            return false;
         }
     }

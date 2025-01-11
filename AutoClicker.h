@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <iostream>
 #include <vector>
-#include "bitmap_structs.h"
+#include "config.h"
 
 class ImageProcessor;
 
@@ -16,9 +16,11 @@ class AutoClicker {
 public:
     // Function to emulate a mouse click at given x, y coordinates
     void emulateMouseClick(int x, int y, bool addDelay = false);
-
     void selectColorFromPallete(std::vector<ColorEntry> ce, RGB colorToSelect, ImageProcessor& ip, int cellWidth, int cellHeight, int bias = 10);
     bool testColorPalleteAlignment(std::vector<ColorEntry> cp, ImageProcessor& ip, int cellWidth, int cellHeight, int bias = 10);
+    static POINT getMouseClickCoords();
+    static void openAndMaximizePaint();
+    static void FocusConsoleWindow();
 };
 
 #endif // !AUTOCLICKER_H

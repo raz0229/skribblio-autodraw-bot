@@ -19,7 +19,7 @@ class ImageDownloader {
 
 public:
     ImageDownloader(const std::string& key, std::string suffix) :apiKey(key) ,searchSuffix(suffix) {}
-    void downloadImageUsingGoogleSearch(const std::string& searchTerm, const std::string& outputFile);
+    bool downloadImageUsingGoogleSearch(const std::string& searchTerm, const std::string& outputFile);
 };
 
 

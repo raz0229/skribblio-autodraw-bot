@@ -1,7 +1,9 @@
 #include "AutoClicker.h"
 #include "ImageProcessor.h"
+#include "config.h"
 #include <windows.h>
 #include <vector>
+#include <tchar.h> // For _T macros
 
 COLORREF AutoClicker::getPixelColorUnderCursor() {
     // Retrieve the cursor's position
@@ -47,7 +49,7 @@ void AutoClicker::emulateMouseClick(int x, int y, bool addDelay) {
 
 bool AutoClicker::testColorPalleteAlignment(std::vector<ColorEntry> colorPallete, ImageProcessor& ip, int cellWidth, int cellHeight, int bias) {
     // // Load the template image
-    cv::Mat templateImage = cv::imread("pallete.png");
+    cv::Mat templateImage = cv::imread(palleteImagePath);
 
     if (templateImage.empty()) {
         std::cerr << "Error: Could not load the template image." << std::endl;
@@ -73,7 +75,7 @@ bool AutoClicker::testColorPalleteAlignment(std::vector<ColorEntry> colorPallete
                 std::cout << "Found Color {" << int(currentColor.r) << "," << int(currentColor.g) << "," << int(currentColor.b) << "} at Position: (" << ce.x << "," << ce.y << ") with bias " << bias << std::endl;
             }
             else {
-                std::cerr << "COLOR NOT FIND color at Position: (" << ce.x << "," << ce.y << ") with bias " << bias << std::endl;
+                std::cerr << "COLOR NOT FOUND color at Position: (" << ce.x << "," << ce.y << ") with bias " << bias << std::endl;
                 return false;
             }
 
@@ -87,23 +89,16 @@ bool AutoClicker::testColorPalleteAlignment(std::vector<ColorEntry> colorPallete
 
     }
     catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-        std::cerr << "\nColor Pallete for MS Paint NOT FOUND or Modified" << std::endl;
-        std::cout << "Here\'s what you can do: " << std::endl;
-        std::cout << "0) Ensure your display is not scaled above 100%" << std::endl;
-        std::cout << "1) Try manually updating the bias value" << std::endl;
-        std::cout << "2) Ensure the color pallete found in code is same as yours in MS Paint" << std::endl;
-        std::cout << "3) Contact Developer" << std::endl;
         return false;
     }
 }
 
 void AutoClicker::selectColorFromPallete(std::vector<ColorEntry> colorPallete, RGB colorToSelect, ImageProcessor& ip, int cellWidth, int cellHeight, int bias) {
     // // Load the template image
-    cv::Mat templateImage = cv::imread("pallete.png");
+    cv::Mat templateImage = cv::imread(palleteImagePath);
 
     if (templateImage.empty()) {
-        std::cerr << "Error: Could not load the template image." << std::endl;
+        std::cerr << "Error: Could not load the template image: " << palleteImagePath << std::endl;
         return;
     }
 
@@ -132,7 +127,7 @@ void AutoClicker::selectColorFromPallete(std::vector<ColorEntry> colorPallete, R
                     std::cerr << "COLOR NOT FOUND at Position: (" << ce.x << "," << ce.y << ") with bias " << bias << std::endl;
                     std::cerr << "click x = " << (location.x + bias + (cellWidth * ce.y)) << " click y = " << (location.y + bias + (cellHeight * ce.x)) << std::endl;
                     return;
-                    // Retry
+                    // Retry (CAUTION: Can cause stack overflow)
                     //selectColorFromPallete(colorPallete, ce.color, ip, cellWidth, cellHeight, bias);
                 }
 
@@ -153,3 +148,66 @@ void AutoClicker::selectColorFromPallete(std::vector<ColorEntry> colorPallete, R
     }
 
 }
+
+POINT AutoClicker::getMouseClickCoords() {
+    POINT point;
+
+    // Infinite loop to check for mouse click
+    while (true) {
+        // Check if the left mouse button is clicked
+        if (GetAsyncKeyState(VK_LBUTTON)) {
+            // Get the current cursor position
+            GetCursorPos(&point);
+            return point; // Exit the function and return the coordinates
+        }
+
+        // Small sleep to avoid high CPU usage
+        Sleep(10);
+    }
+}
+
+
+void AutoClicker::openAndMaximizePaint() {
+    // Find the Paint window
+    HWND hwndPaint = FindWindow(_T("MSPaintApp"), NULL);
+    if (hwndPaint == NULL) {
+        MessageBox(NULL, _T("Could not find Microsoft Paint. Please launch it!"), _T("Error"), MB_ICONERROR);
+        std::cout << "Launch the Paint app on Windows to proceed" << std::endl;
+        system("pause");
+        openAndMaximizePaint(); // Launch and maximize Paint if it's not running
+        return;
+    }
+
+    // Restore the window if it's minimized
+    if (IsIconic(hwndPaint)) {
+        ShowWindow(hwndPaint, SW_RESTORE);
+    }
+
+    // Bring the window to the foreground
+    SetForegroundWindow(hwndPaint);
+
+    // Maximize the window
+    ShowWindow(hwndPaint, SW_MAXIMIZE);
+}
+
+// Function to focus on the current console window
+void AutoClicker::FocusConsoleWindow() {
+    // Get the handle to the current console window
+    HWND consoleWindow = GetConsoleWindow();
+
+    if (consoleWindow == nullptr) {
+        std::cerr << "Error: Could not retrieve the console window handle.\n";
+        return;
+    }
+
+    // Bring the console window to the foreground
+    if (SetForegroundWindow(consoleWindow)) {
+        std::cout << "Console window brought to the foreground successfully.\n";
+    }
+    else {
+        std::cerr << "Error: Failed to bring the console window to the foreground.\n";
+    }
+}
+
+
+
