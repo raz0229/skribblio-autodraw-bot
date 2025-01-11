@@ -133,9 +133,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AutoClicker.cpp" />
+    <ClCompile Include="ImageDownloader.cpp" />
+    <ClCompile Include="ImageProcessor.cpp" />
     <ClCompile Include="paint-bot.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AutoClicker.h" />
+    <ClInclude Include="bitmap_structs.h" />
+    <ClInclude Include="ImageDownloader.h" />
+    <ClInclude Include="ImageProcessor.h" />
     <ClInclude Include="third-party\stb_image.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
