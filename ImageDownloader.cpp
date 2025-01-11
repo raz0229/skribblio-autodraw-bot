@@ -79,9 +79,8 @@ bool ImageDownloader::downloadImage(const std::string& url, const std::string& o
 
     void ImageDownloader::downloadImageUsingGoogleSearch(const std::string& searchTerm, const std::string& outputFile) {
         try {
-            const std::string apiKey = "AIzaSyB4hl9a1RPB_MmuqPm_zNmO49Y20qSf9e4";
             const std::string cx = "7204b6b1decb42058";
-            const std::string query = searchTerm + " white background";
+            const std::string query = searchTerm + searchSuffix;
             const std::string url = "https://www.googleapis.com/customsearch/v1?q=" + query +
                 "&cx=" + cx + "&searchType=image&imgSize=LARGE&safe=high&key=" + apiKey;
 

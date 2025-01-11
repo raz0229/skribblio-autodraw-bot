@@ -18,6 +18,7 @@
 #include "AutoClicker.h"
 #include "ImageProcessor.h"
 #include "ImageDownloader.h"
+#include "third-party/dotenv.h"
 
 
 
@@ -29,15 +30,32 @@
 
 
 int main() {
-    // Example usage: click at (500, 300)
-    //int x;
-    //int y;
 
-    // Call the function to click at the specified location
+    dotenv env(".env");
+
+    // Access environment variables
+    std::string x_apikey = env.get("GOOGLE_CUSTOM_SEARCH_API_KEY", "no-key");
+    std::string bias_s = env.get("BIAS", "15");
+    int bias = 15;
+
+
+    if (x_apikey == "no-key") {
+        std::cerr << "No GOOGLE_CUSTOM_SEARCH_API_KEY found in .env : Program is exiting";
+        return -1;
+    }
+    else {
+        bias = std::atoi(bias_s.c_str());
+        std::cout << "[LOADED] API_KEY = " << x_apikey << std::endl;
+        std::cout << "[LOADED] BIAS = " << bias << std::endl << std::endl;
+    }
+
     AutoClicker ac;
-    //ac.emulateMouseClick(x, y);
+    ImageProcessor ip;
+    ImageDownloader id(x_apikey, " white background");  // Add "white background" to every searh query
 
     try {
+
+
         // Example usage
         std::string inputPath = "input.bmp";
         std::string outputPath = "output.txt";
@@ -68,10 +86,6 @@ int main() {
     {{112, 146, 190}, 1, 8},
     {{200, 191, 231}, 1, 9},
         };
-
-
-        ImageProcessor ip;
-        ImageDownloader id;
 
         // Test color Pallete Alignment
         //ac.testColorPalleteAlignment(colorPalette, ip, 22, 22, 10);
@@ -122,7 +136,7 @@ int main() {
         // Split image colors and start drawing
         std::cout << "Sleeping for 3 seconds" << std::endl;
         Sleep(3000);
-        ip.splitImageByColorsAndStartDrawing("image_20bit.bmp", ac, colorPalette, 22,22,15);
+        ip.splitImageByColorsAndStartDrawing("image_20bit.bmp", ac, colorPalette, 22,22,bias);
 
 
         

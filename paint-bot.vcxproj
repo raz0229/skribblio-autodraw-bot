@@ -143,7 +143,9 @@
     <ClInclude Include="bitmap_structs.h" />
     <ClInclude Include="ImageDownloader.h" />
     <ClInclude Include="ImageProcessor.h" />
-    <ClInclude Include="third-party\stb_image.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".env" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
