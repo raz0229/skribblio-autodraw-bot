@@ -51,11 +51,11 @@ int main() {
             std::cout << "0) Ensure your system display is not scaled above 100%" << std::endl;
             std::cout << "1) Try manually updating the bias value in .env file" << std::endl;
             std::cout << "2) Ensure the color pallete found in code: \'" << palleteImagePath << "\' is same as yours in MS Paint" << std::endl;
-            std::cout << "3) Contact Developer" << std::endl;
+            std::cout << "3) Contact Developer: @raz0229" << std::endl;
             return -1;
         }
 
-       
+        
         while (1) {
             // Download image as BMP
             AutoClicker::FocusConsoleWindow();
