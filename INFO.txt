@@ -1,0 +1,14 @@
+This project is simple Console Application and a reimplementation of github@raz0229/skribblio-autodraw-bot in C++ for Microsoft Paint program that helps you 
+to draw anything in MS Paint. All you have to do is to input what you want to draw, choose a brush in MS Paint and the bot will handle the rest.
+Done as Sem final OOP Project
+Submitted to: M Umar
+Submitted By: Labaik Group
+Group Members:
+	Abdullah Zafar (L1F23BSAI0054)
+	Talha Abid (L1F23BSAI0058)
+	Abdurrehman (L1F23BSAI0050)
+Supported System:
+	Windows 7/8/8.1/10
+	Windows API 7+
+	C++ 17+
+Have fun! :)

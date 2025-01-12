@@ -153,9 +153,16 @@
     <ClInclude Include="config.h" />
     <ClInclude Include="ImageDownloader.h" />
     <ClInclude Include="ImageProcessor.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".env" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="bot_regular_icon_203029.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="paint-bot.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
