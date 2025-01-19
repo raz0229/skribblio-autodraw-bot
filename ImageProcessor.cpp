@@ -94,7 +94,13 @@ void ImageProcessor::startDrawing(const cv::Mat& image, AutoClicker& ac, POINT c
 }
 
 // Scale a BMP image
-void ImageProcessor::scaleBMP(const std::string& inputPath, const std::string& outputPath, int newWidth, int newHeight) {
+void ImageProcessor::scaleBMP() {
+
+    const std::string& inputPath = getInputPath(); 
+    const std::string& outputPath = getScaledImagePath();
+    int newWidth = getNewWidth();
+    int newHeight = getNewHeight();
+
     // Open the input BMP file
     std::ifstream inputFile(inputPath, std::ios::binary);
     if (!inputFile) {
@@ -162,7 +168,10 @@ void ImageProcessor::scaleBMP(const std::string& inputPath, const std::string& o
 }
 
 // Reduce the number of colors in a BMP image
-void ImageProcessor::reduceImageColors(const std::string& inputPath, const std::string& outputPath, const std::vector<ColorEntry>& colorPalette) {
+void ImageProcessor::reduceImageColors(const std::vector<ColorEntry>& colorPalette) {
+    const std::string& inputPath = getScaledImagePath();
+    const std::string& outputPath = getFinalProcessedImagePath();
+
     // Open the input BMP file
     std::ifstream inputFile(inputPath, std::ios::binary);
     if (!inputFile) {
@@ -218,9 +227,10 @@ void ImageProcessor::reduceImageColors(const std::string& inputPath, const std::
 }
 
 // Save an image as BMP
-bool ImageProcessor::saveAsBMP(const std::string& filename, unsigned char* imageData, int width, int height) {
+bool ImageProcessor::saveAsBMP(unsigned char* imageData, int width, int height) {
     // Swap RGB to BGR
     swapRGBToBGR(imageData, width, height);
+    const std::string& filename = getInputPath();
 
     // Prepare the BMP headers
     BMPFileHeader fileHeader;
@@ -284,7 +294,12 @@ std::size_t ImageProcessor::Vec3bHash::operator()(const cv::Vec3b& color) const 
 }
 
 // Split the image by colors and start drawing
-void ImageProcessor::splitImageByColorsAndStartDrawing(const std::string& inputFile, AutoClicker& ac, std::vector<ColorEntry> colorPallete, POINT clickPosition, int cellWidth, int cellHeight, int bias) {
+void ImageProcessor::splitImageByColorsAndStartDrawing(AutoClicker& ac, std::vector<ColorEntry> colorPallete, POINT clickPosition, int bias) {
+    const std::string& inputFile = getFinalProcessedImagePath();
+    int cellWidth = getCellWidthMSPaint();
+    int cellHeight = getCellHeightMSPaint();
+
+
     // Load the BMP image
     cv::Mat image = cv::imread(inputFile, cv::IMREAD_COLOR);
     if (image.empty()) {
@@ -329,7 +344,8 @@ void ImageProcessor::splitImageByColorsAndStartDrawing(const std::string& inputF
 
         // Select a color
         //Sleep(1000);
-        ac.selectColorFromPallete(colorPallete, { color[2], color[1], color[0] }, *this, cellWidth, cellHeight, bias);
+        Image img;
+        ac.selectColorFromPallete(img, colorPallete, { color[2], color[1], color[0] }, *this, cellWidth, cellHeight, bias);
         this->startDrawing(coloredImage, ac, clickPosition);
 
     }

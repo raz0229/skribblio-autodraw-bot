@@ -77,8 +77,9 @@ bool ImageDownloader::downloadImage(const std::string& url, const std::string& o
 }
 
 
-    bool ImageDownloader::downloadImageUsingGoogleSearch(const std::string& searchTerm, const std::string& outputFile) {
+    bool ImageDownloader::downloadImageUsingGoogleSearch(const std::string& searchTerm) {
         try {
+            const std::string& outputFile = getImageDownloadPath();
             const std::string cx = "7204b6b1decb42058";
             const std::string query = searchTerm + searchSuffix;
             const std::string url = "https://www.googleapis.com/customsearch/v1?q=" + query +

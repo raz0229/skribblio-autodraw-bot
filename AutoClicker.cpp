@@ -6,6 +6,7 @@
 #include <tchar.h> // For _T macros
 
 COLORREF AutoClicker::getPixelColorUnderCursor() {
+
     // Retrieve the cursor's position
     POINT cursorPos;
     if (GetCursorPos(&cursorPos)) {
@@ -47,9 +48,9 @@ void AutoClicker::emulateMouseClick(int x, int y, bool addDelay) {
     mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
 }
 
-bool AutoClicker::testColorPalleteAlignment(std::vector<ColorEntry> colorPallete, ImageProcessor& ip, int cellWidth, int cellHeight, int bias) {
+bool AutoClicker::testColorPalleteAlignment(Image img, std::vector<ColorEntry> colorPallete, ImageProcessor& ip, int cellWidth, int cellHeight, int bias) {
     // // Load the template image
-    cv::Mat templateImage = cv::imread(palleteImagePath);
+    cv::Mat templateImage = cv::imread(img.getPalleteImagePath());
 
     if (templateImage.empty()) {
         std::cerr << "Error: Could not load the template image." << std::endl;
@@ -93,12 +94,12 @@ bool AutoClicker::testColorPalleteAlignment(std::vector<ColorEntry> colorPallete
     }
 }
 
-void AutoClicker::selectColorFromPallete(std::vector<ColorEntry> colorPallete, RGB colorToSelect, ImageProcessor& ip, int cellWidth, int cellHeight, int bias) {
+void AutoClicker::selectColorFromPallete(Image img, std::vector<ColorEntry> colorPallete, RGB colorToSelect, ImageProcessor& ip, int cellWidth, int cellHeight, int bias) {
     // // Load the template image
-    cv::Mat templateImage = cv::imread(palleteImagePath);
+    cv::Mat templateImage = cv::imread(img.getPalleteImagePath());
 
     if (templateImage.empty()) {
-        std::cerr << "Error: Could not load the template image: " << palleteImagePath << std::endl;
+        std::cerr << "Error: Could not load the template image: " << img.getPalleteImagePath() << std::endl;
         return;
     }
 

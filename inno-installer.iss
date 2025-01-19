@@ -44,16 +44,16 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\.env"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\download.bmp"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\image_20bit.bmp"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\image_scaled.bmp"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\input.bmp"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\opencv_world4100.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\paint-bot.pdb"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\pallete.bmp"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\pallete.png"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: dontcopy
+Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\.env"; DestDir: "{app}"; Flags: dontcopy
+Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\download.bmp"; DestDir: "{app}"; Flags: dontcopy
+Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\image_20bit.bmp"; DestDir: "{app}"; Flags: dontcopy
+Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\image_scaled.bmp"; DestDir: "{app}"; Flags: dontcopy
+Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\input.bmp"; DestDir: "{app}"; Flags: dontcopy
+Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\opencv_world4100.dll"; DestDir: "{app}"; Flags: dontcopy
+Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\paint-bot.pdb"; DestDir: "{app}"; Flags: dontcopy
+Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\pallete.bmp"; DestDir: "{app}"; Flags: dontcopy
+Source: "C:\Users\rajpo\source\repos\paint-bot\x64\Release\pallete.png"; DestDir: "{app}"; Flags: dontcopy
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

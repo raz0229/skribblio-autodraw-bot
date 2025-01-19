@@ -47,17 +47,85 @@ struct ColorEntry {
 };
 
 
-static std::string inputPath = "input.bmp";
-static std::string palleteImagePath = "pallete.png";
-static std::string biasCustomValue = "15";
-static std::string searchTermSuffix = " white background";  // Add "white background" to every searh query
-static std::string imageDownloadPath = "download.bmp";
-static std::string scaledImagePath = "image_scaled.bmp";
-static std::string finalProcessedImagePath = "image_20bit.bmp";
-static int newWidth = 500; // Width of scaled Image
-static int newHeight = 352; // Height of scaled Image
-static int cellWidthMSPaint = 22;
-static int cellHeightMSPaint = 22;
+class Image {
+private:
+    std::string inputPath;
+    std::string palleteImagePath;
+    std::string biasCustomValue;
+    std::string searchTermSuffix;
+    std::string imageDownloadPath;
+    std::string scaledImagePath;
+    std::string finalProcessedImagePath;
+    int newWidth;
+    int newHeight;
+    int cellWidthMSPaint;
+    int cellHeightMSPaint;
+
+public:
+    // Parameterized constructor
+    Image(
+        const std::string& inputPath = "input.bmp",
+        const std::string& palleteImagePath = "pallete.png",
+        const std::string& biasCustomValue = "15",
+        const std::string& searchTermSuffix = " white background",
+        const std::string& imageDownloadPath = "download.bmp",
+        const std::string& scaledImagePath = "image_scaled.bmp",
+        const std::string& finalProcessedImagePath = "image_20bit.bmp",
+        int newWidth = 500,
+        int newHeight = 352,
+        int cellWidthMSPaint = 22,
+        int cellHeightMSPaint = 22
+    ) : inputPath(inputPath),
+        palleteImagePath(palleteImagePath),
+        biasCustomValue(biasCustomValue),
+        searchTermSuffix(searchTermSuffix),
+        imageDownloadPath(imageDownloadPath),
+        scaledImagePath(scaledImagePath),
+        finalProcessedImagePath(finalProcessedImagePath),
+        newWidth(newWidth),
+        newHeight(newHeight),
+        cellWidthMSPaint(cellWidthMSPaint),
+        cellHeightMSPaint(cellHeightMSPaint) {
+    }
+
+    // Getters
+    std::string getInputPath() const { return inputPath; }
+    std::string getPalleteImagePath() const { return palleteImagePath; }
+    std::string getBiasCustomValue() const { return biasCustomValue; }
+    std::string getSearchTermSuffix() const { return searchTermSuffix; }
+    std::string getImageDownloadPath() const { return imageDownloadPath; }
+    std::string getScaledImagePath() const { return scaledImagePath; }
+    std::string getFinalProcessedImagePath() const { return finalProcessedImagePath; }
+    int getNewWidth() const { return newWidth; }
+    int getNewHeight() const { return newHeight; }
+    int getCellWidthMSPaint() const { return cellWidthMSPaint; }
+    int getCellHeightMSPaint() const { return cellHeightMSPaint; }
+
+    // Setters
+    void setInputPath(const std::string& path) { inputPath = path; }
+    void setPalleteImagePath(const std::string& path) { palleteImagePath = path; }
+    void setBiasCustomValue(const std::string& value) { biasCustomValue = value; }
+    void setSearchTermSuffix(const std::string& suffix) { searchTermSuffix = suffix; }
+    void setImageDownloadPath(const std::string& path) { imageDownloadPath = path; }
+    void setScaledImagePath(const std::string& path) { scaledImagePath = path; }
+    void setFinalProcessedImagePath(const std::string& path) { finalProcessedImagePath = path; }
+    void setNewWidth(int width) { newWidth = width; }
+    void setNewHeight(int height) { newHeight = height; }
+    void setCellWidthMSPaint(int width) { cellWidthMSPaint = width; }
+    void setCellHeightMSPaint(int height) { cellHeightMSPaint = height; }
+};
+
+//static std::string inputPath = "input.bmp";
+//static std::string palleteImagePath = "pallete.png";
+//static std::string biasCustomValue = "15";
+//static std::string searchTermSuffix = " white background";  // Add "white background" to every searh query
+//static std::string imageDownloadPath = "download.bmp";
+//static std::string scaledImagePath = "image_scaled.bmp";
+//static std::string finalProcessedImagePath = "image_20bit.bmp";
+//static int newWidth = 500; // Width of scaled Image
+//static int newHeight = 352; // Height of scaled Image
+//static int cellWidthMSPaint = 22;
+//static int cellHeightMSPaint = 22;
 
 // Define the color palette in MS Paint ({RGB}, x_pos, y_pos)
 static std::vector<ColorEntry> colorPalette = {

@@ -14,7 +14,7 @@
 #include <opencv2/opencv.hpp>
 #include "AutoClicker.h"
 
-class ImageProcessor {
+class ImageProcessor : public Image {
 private:
     RGB findClosestColor(const RGB& pixel, const std::vector<ColorEntry>& colorPalette);
     void swapRGBToBGR(unsigned char* imageData, int width, int height);
@@ -22,14 +22,14 @@ private:
 public:
     cv::Mat captureScreen();
     void startDrawing(const cv::Mat& image, AutoClicker& ac, POINT clickPosition, int brush_size = 4);
-    void scaleBMP(const std::string& inputPath, const std::string& outputPath, int newWidth, int newHeight);
-    void reduceImageColors(const std::string& inputPath, const std::string& outputPath, const std::vector<ColorEntry>& colorPalette);
-    bool saveAsBMP(const std::string& filename, unsigned char* imageData, int width, int height);
+    void scaleBMP();
+    void reduceImageColors(const std::vector<ColorEntry>& colorPalette);
+    bool saveAsBMP(unsigned char* imageData, int width, int height);
 
     struct Vec3bHash {
         std::size_t operator()(const cv::Vec3b& color) const;
     };
 
-    void splitImageByColorsAndStartDrawing(const std::string& inputFile, AutoClicker& ac, std::vector<ColorEntry> colorPallete, POINT clickPosition, int cellWidth = 22, int cellHeight = 22, int bias = 14);
+    void splitImageByColorsAndStartDrawing(AutoClicker& ac, std::vector<ColorEntry> colorPallete, POINT clickPosition, int bias = 14);
     cv::Point locateImageOnScreen(const cv::Mat& screenImage, const cv::Mat& templateImage);
 };

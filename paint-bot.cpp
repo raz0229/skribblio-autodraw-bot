@@ -15,12 +15,13 @@
 
 int main() {
 
+    Image img;  // base class
     dotenv env(".env");
 
     // Access environment variables
     std::string x_apikey = env.get("GOOGLE_CUSTOM_SEARCH_API_KEY", "no-key");
-    std::string bias_s = env.get("BIAS", biasCustomValue);
-    int bias = std::atoi(biasCustomValue.c_str());
+    std::string bias_s = env.get("BIAS", img.getBiasCustomValue());
+    int bias = std::atoi(img.getBiasCustomValue().c_str());
 
 
     if (x_apikey == "no-key") {
@@ -35,7 +36,7 @@ int main() {
 
     AutoClicker ac;
     ImageProcessor ip;
-    ImageDownloader id(x_apikey, searchTermSuffix);
+    ImageDownloader id(x_apikey);
 
     try {
 
@@ -45,12 +46,12 @@ int main() {
        
         // Test color Pallete Alignment
         Sleep(1000);
-        if (!ac.testColorPalleteAlignment(colorPalette, ip, cellWidthMSPaint, cellHeightMSPaint, bias)) {
+        if (!ac.testColorPalleteAlignment(img, colorPalette, ip, img.getCellWidthMSPaint(), img.getCellHeightMSPaint(), bias)) {
             std::cerr << "\nColor Pallete for MS Paint NOT FOUND or Modified" << std::endl;
             std::cout << "Here\'s what you can do: " << std::endl;
             std::cout << "0) Ensure your system display is not scaled above 100%" << std::endl;
             std::cout << "1) Try manually updating the bias value in .env file" << std::endl;
-            std::cout << "2) Ensure the color pallete found in code: \'" << palleteImagePath << "\' is same as yours in MS Paint" << std::endl;
+            std::cout << "2) Ensure the color pallete found in code: \'" << img.getPalleteImagePath() << "\' is same as yours in MS Paint" << std::endl;
             std::cout << "3) Contact Developer: @raz0229" << std::endl;
             return -1;
         }
@@ -64,7 +65,7 @@ int main() {
             std::cout << "Enter what to draw: ";
             getline(std::cin, searchTerm);
             
-            if (!id.downloadImageUsingGoogleSearch(searchTerm, imageDownloadPath)) {
+            if (!id.downloadImageUsingGoogleSearch(searchTerm)) {
                 std::cout << "[ERROR] You need a stable internet connection to proceed." << std::endl;
                 system("pause");
                 return -1;
@@ -73,19 +74,19 @@ int main() {
 
             // Convert image into bmp
             int width, height, channels;
-            unsigned char* imageData = stbi_load(imageDownloadPath.c_str(), &width, &height, &channels, STBI_rgb);        // Load the image using stb_image
+            unsigned char* imageData = stbi_load(img.getImageDownloadPath().c_str(), &width, &height, &channels, STBI_rgb);        // Load the image using stb_image
             if (imageData == nullptr) {
-                std::cerr << "Error loading image: " << imageDownloadPath << std::endl;
+                std::cerr << "Error loading image: " << img.getImageDownloadPath() << std::endl;
                 return -1;
             }
-            ip.saveAsBMP(inputPath, imageData, width, height);  // Save the loaded image
+            ip.saveAsBMP(imageData, width, height);  // Save the loaded image
             stbi_image_free(imageData);         // Free the image data after use
 
 
             // Scale the converted image
-            ip.scaleBMP(inputPath, scaledImagePath, newWidth, newHeight);
-            std::cout << "Image scaled successfully. Saved to: " << scaledImagePath << std::endl;
-            ip.reduceImageColors(scaledImagePath, finalProcessedImagePath, colorPalette); // Reduce the scaled image into a 20-bit color image
+            ip.scaleBMP();
+            std::cout << "Image scaled successfully. Saved to: " << img.getScaledImagePath() << std::endl;
+            ip.reduceImageColors(colorPalette); // Reduce the scaled image into a 20-bit color image
             std::cout << "Image processed successfully." << std::endl;
             system("cls");
 
@@ -99,7 +100,7 @@ int main() {
             POINT clickPosition = AutoClicker::getMouseClickCoords();
 
             // Split image colors and start drawing
-            ip.splitImageByColorsAndStartDrawing(finalProcessedImagePath, ac, colorPalette, clickPosition, cellWidthMSPaint, cellHeightMSPaint, bias);
+            ip.splitImageByColorsAndStartDrawing(ac, colorPalette, clickPosition, bias);
             std::cout << "[INFO] Finished Drawing! Hope you like it :)" << std::endl;
         }
 
