@@ -115,18 +115,6 @@ public:
     void setCellHeightMSPaint(int height) { cellHeightMSPaint = height; }
 };
 
-//static std::string inputPath = "input.bmp";
-//static std::string palleteImagePath = "pallete.png";
-//static std::string biasCustomValue = "15";
-//static std::string searchTermSuffix = " white background";  // Add "white background" to every searh query
-//static std::string imageDownloadPath = "download.bmp";
-//static std::string scaledImagePath = "image_scaled.bmp";
-//static std::string finalProcessedImagePath = "image_20bit.bmp";
-//static int newWidth = 500; // Width of scaled Image
-//static int newHeight = 352; // Height of scaled Image
-//static int cellWidthMSPaint = 22;
-//static int cellHeightMSPaint = 22;
-
 // Define the color palette in MS Paint ({RGB}, x_pos, y_pos)
 static std::vector<ColorEntry> colorPalette = {
     {{0, 0, 0}, 0, 0},
