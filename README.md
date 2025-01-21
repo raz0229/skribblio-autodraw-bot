@@ -12,6 +12,9 @@ All the code for this project can be found on:
 [this repository](https://github.com/raz0229/skribblio-autodraw-bot/blob/cpp/)
  _(Choose the `CPP` branch for this project)_
 
+## UML Diagram
+![Classes, Structs and their relationship](https://i.ibb.co/yq2r6wj/uml.png)
+
 ## Technical Details
 The project is implemented using strong object orientation and coding techniques and style learnt in class. It uses Google's Custom Search API _(API Key can be added in .env file)_ to look for the image results and converts the image into a 20-bit (standard color palette supported by MS Paint) bitmap file _(.bmp)_ which is necessary to preserve the order of pixels in rows and columns to calculate their offset from a starting position. It uses the Windows API to handle Paint and Console Windows and adjust their focus. Likewise, OpenCV is used to look for the desired color pallete on Screen and be able to select all the colors in tray. The downloaded image is split into all the colors it had and each color is drawn on screen (by mouse click for each pixel) relative to the starting position selected by the user.
 
